@@ -615,7 +615,10 @@
     "unavailable": "{translation} doesn't include this selection."
   },
   "commentaryUi": {
-    "introTo": "Intro to {book}"
+    "introTo": "Intro to {book}",
+    "chapterOutline": "Chapter Outline",
+    "previousSection": "Previous section",
+    "nextSection": "Next section"
   },
   "searchLocations": {
     "currentBook": "Current Book",

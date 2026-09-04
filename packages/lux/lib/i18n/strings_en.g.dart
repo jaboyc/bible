@@ -1990,6 +1990,15 @@ class Translations$commentaryUi$en {
 
 	/// en: 'Intro to {book}'
 	String introTo({required Object book}) => 'Intro to ${book}';
+
+	/// en: 'Chapter Outline'
+	String get chapterOutline => 'Chapter Outline';
+
+	/// en: 'Previous section'
+	String get previousSection => 'Previous section';
+
+	/// en: 'Next section'
+	String get nextSection => 'Next section';
 }
 
 // Path: searchLocations
@@ -5322,6 +5331,9 @@ extension on Translations {
 			'verseNumbering.explanation' => ({required Object translation, required Object reference, required Object originalReference}) => 'The ${translation} numbers its chapters and verses differently from most English translations.\n\nThe text shown here at ${reference} comes from ${originalReference} in the ${translation}, remapped so it lines up with the other translations.',
 			'compare.unavailable' => ({required Object translation}) => '${translation} doesn\'t include this selection.',
 			'commentaryUi.introTo' => ({required Object book}) => 'Intro to ${book}',
+			'commentaryUi.chapterOutline' => 'Chapter Outline',
+			'commentaryUi.previousSection' => 'Previous section',
+			'commentaryUi.nextSection' => 'Next section',
 			'searchLocations.currentBook' => 'Current Book',
 			'searchLocations.testaments' => 'Testaments',
 			'searchLocations.books' => 'Books',

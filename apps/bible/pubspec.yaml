@@ -110,7 +110,9 @@ flutter:
     - assets/translations/tr/
     - assets/strongs/
     - assets/dictionary/
-    - assets/commentary/
+    - assets/commentary/calvin/
+    - assets/commentary/jamieson_fausset_brown/
+    - assets/commentary/matthew_henry/
     - assets/cross_references/
     - assets/bible_plans/
     - assets/audio_bible_timings/

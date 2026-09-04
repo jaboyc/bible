@@ -4,11 +4,12 @@ import 'dart:isolate';
 import 'package:bible/models/commentary.dart';
 import 'package:bible/models/commentary_type.dart';
 import 'package:flutter/services.dart';
+import 'package:lux/lux_core.dart';
 
 class CommentaryImporter {
-  Future<Commentary> import({required CommentaryType type}) async {
-    final json = await rootBundle.loadString(type.assetPath);
-    return Isolate.run(() => Commentary.fromJson(jsonDecode(json)));
+  Future<CommentaryBook> import({required CommentaryType type, required BookType book}) async {
+    final json = await rootBundle.loadString(type.getAssetPath(book));
+    return Isolate.run(() => CommentaryBook.fromJson(jsonDecode(json)));
   }
 }
 
@@ -19,5 +20,5 @@ extension on CommentaryType {
     .calvin => 'calvin',
   };
 
-  String get assetPath => 'assets/commentary/$assetName.json';
+  String getAssetPath(BookType book) => 'assets/commentary/$assetName/${book.usxCode()}.json';
 }

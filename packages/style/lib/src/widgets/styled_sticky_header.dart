@@ -14,6 +14,7 @@ class StyledStickyHeader extends StatelessWidget {
   final Widget? trailing;
 
   final Function()? onHeaderPressed;
+  final EdgeInsets headerPadding;
 
   final bool showChildren;
   final List<Widget> children;
@@ -24,6 +25,7 @@ class StyledStickyHeader extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onHeaderPressed,
+    this.headerPadding = const .all(16),
     this.showChildren = true,
     required this.children,
   });
@@ -34,9 +36,11 @@ class StyledStickyHeader extends StatelessWidget {
     this.subtitle,
     this.trailing,
     this.onHeaderPressed,
+    this.headerPadding = const .all(16),
     required Widget child,
+    EdgeInsets childPadding = const .symmetric(horizontal: 16),
   }) : showChildren = true,
-       children = [Padding(padding: .symmetric(horizontal: 16), child: child)];
+       children = [Padding(padding: childPadding, child: child)];
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +50,7 @@ class StyledStickyHeader extends StatelessWidget {
         return Column(
           children: [
             StyledMaterial(
-              padding: .all(16),
+              padding: headerPadding,
               colorBuilder: .surfacePrimary,
               onPressed: onHeaderPressed,
               isEnabled: true,

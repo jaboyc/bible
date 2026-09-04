@@ -621,7 +621,10 @@
     "unavailable": "{translation} не включает этот выбор."
   },
   "commentaryUi": {
-    "introTo": "Знакомство с {book}"
+    "introTo": "Знакомство с {book}",
+    "chapterOutline": "План главы",
+    "previousSection": "Предыдущий раздел",
+    "nextSection": "Следующий раздел"
   },
   "searchLocations": {
     "currentBook": "Текущая книга",

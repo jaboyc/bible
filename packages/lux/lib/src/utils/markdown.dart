@@ -15,6 +15,11 @@ extension type Markdown(String text) {
   static List<Markdown> fromJsonList(List<dynamic> texts) => texts.cast<String>().map(Markdown.fromJson).toList();
   static List<String> toJsonList(List<Markdown> markdown) => markdown.map(toJson).toList();
 
+  static List<List<Markdown>> fromJsonTable(List<dynamic> rows) =>
+      rows.cast<List<dynamic>>().map((row) => row.cast<String>().map(Markdown.fromJson).toList()).toList();
+  static List<List<String>> toJsonTable(List<List<Markdown>> rows) =>
+      rows.map((row) => row.map(toJson).toList()).toList();
+
   static Markdown? fromJsonNullable(String? text) => text == null ? null : Markdown(text);
   static String? toJsonNullable(Markdown? markdown) => markdown?.text;
 

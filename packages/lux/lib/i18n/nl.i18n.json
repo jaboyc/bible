@@ -617,7 +617,10 @@
     "unavailable": "{translation} bevat deze selectie niet."
   },
   "commentaryUi": {
-    "introTo": "Inleiding tot {book}"
+    "introTo": "Inleiding tot {book}",
+    "chapterOutline": "Hoofdstukoverzicht",
+    "previousSection": "Vorige sectie",
+    "nextSection": "Volgende sectie"
   },
   "searchLocations": {
     "currentBook": "Huidig boek",

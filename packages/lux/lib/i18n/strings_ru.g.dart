@@ -963,6 +963,9 @@ class _Translations$commentaryUi$ru extends Translations$commentaryUi$en {
 
 	// Translations
 	@override String introTo({required Object book}) => 'Знакомство с ${book}';
+	@override String get chapterOutline => 'План главы';
+	@override String get previousSection => 'Предыдущий раздел';
+	@override String get nextSection => 'Следующий раздел';
 }
 
 // Path: searchLocations
@@ -3356,6 +3359,9 @@ extension on TranslationsRu {
 			'verseNumbering.explanation' => ({required Object translation, required Object reference, required Object originalReference}) => '${translation} нумерует главы и стихи иначе, чем в большинстве английских переводов.\n\nТекст, показанный здесь в ${reference}, взят из ${originalReference} в ${translation} и переназначен, чтобы соответствовать другим переводам.',
 			'compare.unavailable' => ({required Object translation}) => '${translation} не включает этот выбор.',
 			'commentaryUi.introTo' => ({required Object book}) => 'Знакомство с ${book}',
+			'commentaryUi.chapterOutline' => 'План главы',
+			'commentaryUi.previousSection' => 'Предыдущий раздел',
+			'commentaryUi.nextSection' => 'Следующий раздел',
 			'searchLocations.currentBook' => 'Текущая книга',
 			'searchLocations.testaments' => 'Заветы',
 			'searchLocations.books' => 'Книги',

@@ -23,6 +23,10 @@ dart run bin/generate_verse_of_the_day.dart
 
 Bible generators write one minified runtime asset per book under `assets/translations/<translation>/`, using USX book codes such as `GEN.json`. The book type is derived from the asset path and is not repeated inside the JSON.
 
+`generate_commentary_json.dart` writes the same per-book layout under `assets/commentary/<commentary>/`. Commentary
+assets preserve book introductions, Matthew Henry chapter outlines, ordered verse-linked sections, normalized paragraph
+presentation, and source tables.
+
 `generate_audio_bible_timings_json.dart` validates their canonical chapter and verse coverage, removes the verse text and source metadata, and writes one minified runtime asset per Audio Bible.
 
 `generate_navigators_5x5x5_source.dart` writes its normalized input file into `content/sources/reading_plans/` before `generate_bible_plans_json.dart` reads it.

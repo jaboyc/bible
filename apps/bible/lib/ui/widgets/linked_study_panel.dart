@@ -1,4 +1,3 @@
-import 'package:bible/ui/widgets/visible_verse_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:lux/lux.dart';
@@ -12,14 +11,17 @@ class LinkedStudyPanel extends HookWidget {
 
   final ChapterReference chapterReference;
   final Reference? passageTopReference;
+  final ScrollController scrollController;
 
   final Function(Reference) onScrollMainToReference;
-  final Function(Reference, double panelHeight, PassageController) onScrollPanelToReference;
+  final Function(Reference, double panelHeight) onScrollPanelToReference;
+  final Reference? Function(double viewportTop, double viewportBottom) getTopVisibleReference;
 
   final bool isActive;
+  final bool isContentLoaded;
   final bool showDragHandle;
 
-  final Widget Function(BuildContext, PassageController, Function() onContentLoaded) builder;
+  final Widget child;
 
   const LinkedStudyPanel({
     super.key,
@@ -28,22 +30,21 @@ class LinkedStudyPanel extends HookWidget {
     required this.onClose,
     required this.chapterReference,
     required this.passageTopReference,
+    required this.scrollController,
     required this.onScrollMainToReference,
     required this.onScrollPanelToReference,
+    required this.getTopVisibleReference,
     required this.isActive,
+    required this.isContentLoaded,
     required this.showDragHandle,
-    required this.builder,
+    required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    final controller = usePassageController(chapterReference);
-    final scrollController = controller.scrollController;
     final panelViewportKey = useMemoized(() => GlobalKey());
 
     final topReferenceState = useState(passageTopReference);
-    final isContentLoadedState = useState(false);
-
     final ownsScrollRef = useRef(false);
 
     usePostFrameEffect(() async {
@@ -54,7 +55,7 @@ class LinkedStudyPanel extends HookWidget {
         topReferenceState.value = reference;
       }
 
-      if (!isContentLoadedState.value || ownsScrollRef.value) {
+      if (!isContentLoaded || ownsScrollRef.value) {
         return;
       }
 
@@ -63,20 +64,17 @@ class LinkedStudyPanel extends HookWidget {
         return;
       }
 
-      onScrollPanelToReference(reference, viewportHeight, controller);
-    }, [passageTopReference, isContentLoadedState.value, isActive]);
+      onScrollPanelToReference(reference, viewportHeight);
+    }, [passageTopReference, isContentLoaded, isActive]);
 
     useOnListenableChange(isActive ? scrollController : null, () async {
       if (!isActive) return;
 
-      final visibleReferences = getVisibleReferencesInViewport(
-        keyByReference: controller.keyByReference,
-        viewportTop: panelViewportKey.globalBounds?.top ?? 0,
-        viewportBottom: panelViewportKey.globalBounds?.bottom ?? 0,
+      final topReference = getTopVisibleReference(
+        panelViewportKey.globalBounds?.top ?? 0,
+        panelViewportKey.globalBounds?.bottom ?? 0,
       );
-      if (visibleReferences.isEmpty) return;
-
-      topReferenceState.value = visibleReferences.firstOrNull;
+      if (topReference != null) topReferenceState.value = topReference;
     });
 
     usePostFrameEffect(() {
@@ -101,10 +99,7 @@ class LinkedStudyPanel extends HookWidget {
             ),
             StyledDivider(height: 2),
             Expanded(
-              child: KeyedSubtree(
-                key: panelViewportKey,
-                child: builder(context, controller, () => isContentLoadedState.value = true),
-              ),
+              child: KeyedSubtree(key: panelViewportKey, child: child),
             ),
           ],
         ),

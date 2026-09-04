@@ -12,6 +12,7 @@ import 'package:bible/ui/sheets/commentary_selection_sheet.dart';
 import 'package:bible/ui/sheets/compare_bible_sheet.dart';
 import 'package:bible/ui/sheets/interlinear_direction_sheet.dart';
 import 'package:bible/ui/widgets/audio_bible_panel.dart';
+import 'package:bible/ui/widgets/linked_commentary_study_panel.dart';
 import 'package:bible/ui/widgets/linked_study_panel.dart';
 import 'package:bible/ui/widgets/main_toolbar.dart';
 import 'package:bible/ui/widgets/onboarding_panel.dart';
@@ -621,6 +622,19 @@ class BibleBody extends HookConsumerWidget {
               }
             }
 
+            void scrollMainToReference(Reference reference) {
+              final sizeMultiplier = readerConfiguration
+                  .paragraphsConfiguration(context, mainTranslation)
+                  .sizeMultiplier;
+              final sectionHeight =
+                  chapter?.paragraphs.getSectionTypeForVerse(reference.verseNum)?.getHeight(sizeMultiplier) ?? 0;
+              currentPassageController?.scrollToReference(
+                reference,
+                paragraphs: chapter?.paragraphs ?? [],
+                alignment: (sectionHeight + topBarHeight - 6) / (passageKey.renderBox?.size.height ?? 128),
+              );
+            }
+
             Widget carousel() => SwipePageView(
               controller: studyPanelsPageController,
               pageCount: panelCount,
@@ -648,13 +662,15 @@ class BibleBody extends HookConsumerWidget {
                     padding: isSideLayout ? .symmetric(horizontal: 4) : .zero,
                     child: switch (studyPanel) {
                       CompareStudyPanel(:final translation) => HookBuilder(
+                        key: ValueKey((currentChapterReference, translation)),
                         builder: (context) {
                           final paragraphsState = useState<List<Paragraph>?>(null);
+                          final controller = usePassageController(currentChapterReference);
 
                           return LinkedStudyPanel(
-                            key: ValueKey((i, currentChapterReference, translation)),
                             chapterReference: currentChapterReference,
                             passageTopReference: visibleVerseSelection.references.firstOrNull,
+                            scrollController: controller.scrollController,
                             showDragHandle: !isSideLayout,
                             subtitle: t.studyPanels.compareWith(translation: translation.title()).toText(),
                             trailing: Tooltip(
@@ -671,23 +687,8 @@ class BibleBody extends HookConsumerWidget {
                             ),
                             onClose: () =>
                                 ref.updateUser((user) => user.copyWith(studyPanels: user.studyPanels.withRemovedAt(i))),
-                            onScrollMainToReference: (reference) {
-                              final sizeMultiplier = readerConfiguration
-                                  .paragraphsConfiguration(context, mainTranslation)
-                                  .sizeMultiplier;
-                              final sectionHeight =
-                                  chapter?.paragraphs
-                                      .getSectionTypeForVerse(reference.verseNum)
-                                      ?.getHeight(sizeMultiplier) ??
-                                  0;
-                              currentPassageController?.scrollToReference(
-                                reference,
-                                paragraphs: chapter?.paragraphs ?? [],
-                                alignment:
-                                    (sectionHeight + topBarHeight - 6) / (passageKey.renderBox?.size.height ?? 128),
-                              );
-                            },
-                            onScrollPanelToReference: (reference, panelHeight, controller) {
+                            onScrollMainToReference: scrollMainToReference,
+                            onScrollPanelToReference: (reference, panelHeight) {
                               final sizeMultiplier = readerConfiguration
                                   .paragraphsConfiguration(context, translation)
                                   .sizeMultiplier;
@@ -702,19 +703,51 @@ class BibleBody extends HookConsumerWidget {
                                 alignment: sectionHeight / panelHeight,
                               );
                             },
+                            getTopVisibleReference: (viewportTop, viewportBottom) => getVisibleReferencesInViewport(
+                              keyByReference: controller.keyByReference,
+                              viewportTop: viewportTop,
+                              viewportBottom: viewportBottom,
+                            ).firstOrNull,
                             isActive: currentCarouselPage == i + onboardingOffset,
-                            builder: (context, controller, onContentLoaded) => PassageBuilder(
+                            isContentLoaded: paragraphsState.value != null,
+                            child: PassageBuilder(
                               verseSelection: currentChapterReference.toVerseSelection(),
                               translation: translation,
                               controller: controller,
                               padding: .all(16),
                               onParagraphsLoaded: (paragraphs) {
                                 paragraphsState.value = paragraphs;
-                                onContentLoaded();
                               },
                             ),
                           );
                         },
+                      ),
+                      CommentaryStudyPanel(:final type) => LinkedCommentaryStudyPanel(
+                        key: ValueKey((i, currentChapterReference, type)),
+                        type: type,
+                        chapterReference: currentChapterReference,
+                        passageTopReference: visibleVerseSelection.references.firstOrNull,
+                        onScrollMainToReference: scrollMainToReference,
+                        onNavigateToVerseSelection: navigateToVerseSelection,
+                        onClose: () =>
+                            ref.updateUser((user) => user.copyWith(studyPanels: user.studyPanels.withRemovedAt(i))),
+                        trailing: Tooltip(
+                          message: t.studyPanels.swapCommentary,
+                          child: StyledCircleButton.md(
+                            child: Symbols.tooltip_2.toIcon(),
+                            onPressed: () async {
+                              final newCommentary = await CommentarySelectionSheet.show(
+                                context,
+                                initialCommentary: type,
+                              );
+                              if (newCommentary != null) {
+                                swapStudyPanel(studyPanel.copyWith(type: newCommentary), i);
+                              }
+                            },
+                          ),
+                        ),
+                        isActive: currentCarouselPage == i + onboardingOffset,
+                        showDragHandle: !isSideLayout,
                       ),
                       _ => StyledSheet.builder(
                         key: ValueKey((i, visibleVerseSelection)),
@@ -749,21 +782,6 @@ class BibleBody extends HookConsumerWidget {
                                 );
                                 if (newDirection != null) {
                                   swapStudyPanel(studyPanel.copyWith(direction: newDirection), i);
-                                }
-                              },
-                            ),
-                          ),
-                          CommentaryStudyPanel(:final type) => Tooltip(
-                            message: t.studyPanels.swapCommentary,
-                            child: StyledCircleButton.md(
-                              child: Symbols.tooltip_2.toIcon(),
-                              onPressed: () async {
-                                final newCommentary = await CommentarySelectionSheet.show(
-                                  context,
-                                  initialCommentary: type,
-                                );
-                                if (newCommentary != null) {
-                                  swapStudyPanel(studyPanel.copyWith(type: newCommentary), i);
                                 }
                               },
                             ),

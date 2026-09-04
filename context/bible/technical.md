@@ -95,6 +95,16 @@ Bundled translations are stored as one JSON asset per book. Ordinary reading dec
 for every chapter in that book. Full-text search and Strong's concordance assemble the complete local Bible only when
 those whole-corpus features are opened.
 
+Bundled commentaries are also stored as one JSON asset per book and decoded on demand. Their structured content keeps
+book introductions, Calvin's book-level Arguments, chapter outlines, and verse-linked sections distinct. Only
+verse-linked sections participate in linked-panel synchronization; introductions and outlines remain positioned at
+verse 1 until their linked commentary reaches the top.
+Commentary sections contain normalized content blocks rather than source-specific XML classes. Paragraph blocks retain
+semantic presentation such as quotations, poetry, headings, and attribution, while table blocks retain their rows and
+cells. The bundled explicit outlines are all scoped to one chapter, although each outline item can target any verse
+range supported by `VerseSelection`. Linked Commentary panels precalculate every item extent so their scroll range and
+scrollbar remain stable throughout the chapter.
+
 ### Online Bible Text
 
 These translations are loaded online when they are not available from the device cache:

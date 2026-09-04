@@ -15,14 +15,14 @@ final commentaryProvider = CommentaryFamily._();
 final class CommentaryProvider
     extends
         $FunctionalProvider<
-          AsyncValue<Commentary>,
-          Commentary,
-          FutureOr<Commentary>
+          AsyncValue<CommentaryBook>,
+          CommentaryBook,
+          FutureOr<CommentaryBook>
         >
-    with $FutureModifier<Commentary>, $FutureProvider<Commentary> {
+    with $FutureModifier<CommentaryBook>, $FutureProvider<CommentaryBook> {
   CommentaryProvider._({
     required CommentaryFamily super.from,
-    required CommentaryType super.argument,
+    required ({CommentaryType type, BookType book}) super.argument,
   }) : super(
          retry: null,
          name: r'commentaryProvider',
@@ -38,18 +38,19 @@ final class CommentaryProvider
   String toString() {
     return r'commentaryProvider'
         ''
-        '($argument)';
+        '$argument';
   }
 
   @$internal
   @override
-  $FutureProviderElement<Commentary> $createElement($ProviderPointer pointer) =>
-      $FutureProviderElement(pointer);
+  $FutureProviderElement<CommentaryBook> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  FutureOr<Commentary> create(Ref ref) {
-    final argument = this.argument as CommentaryType;
-    return commentary(ref, type: argument);
+  FutureOr<CommentaryBook> create(Ref ref) {
+    final argument = this.argument as ({CommentaryType type, BookType book});
+    return commentary(ref, type: argument.type, book: argument.book);
   }
 
   @override
@@ -63,10 +64,14 @@ final class CommentaryProvider
   }
 }
 
-String _$commentaryHash() => r'684a8103311907d7562cd734cb1e6b8cc66c23e0';
+String _$commentaryHash() => r'258b06717fcf2eed530d69ffeba1e5c97b509cba';
 
 final class CommentaryFamily extends $Family
-    with $FunctionalFamilyOverride<FutureOr<Commentary>, CommentaryType> {
+    with
+        $FunctionalFamilyOverride<
+          FutureOr<CommentaryBook>,
+          ({CommentaryType type, BookType book})
+        > {
   CommentaryFamily._()
     : super(
         retry: null,
@@ -76,8 +81,10 @@ final class CommentaryFamily extends $Family
         isAutoDispose: false,
       );
 
-  CommentaryProvider call({required CommentaryType type}) =>
-      CommentaryProvider._(argument: type, from: this);
+  CommentaryProvider call({
+    required CommentaryType type,
+    required BookType book,
+  }) => CommentaryProvider._(argument: (type: type, book: book), from: this);
 
   @override
   String toString() => r'commentaryProvider';

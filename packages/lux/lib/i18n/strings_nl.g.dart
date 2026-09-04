@@ -959,6 +959,9 @@ class _Translations$commentaryUi$nl extends Translations$commentaryUi$en {
 
 	// Translations
 	@override String introTo({required Object book}) => 'Inleiding tot ${book}';
+	@override String get chapterOutline => 'Hoofdstukoverzicht';
+	@override String get previousSection => 'Vorige sectie';
+	@override String get nextSection => 'Volgende sectie';
 }
 
 // Path: searchLocations
@@ -3350,6 +3353,9 @@ extension on TranslationsNl {
 			'verseNumbering.explanation' => ({required Object translation, required Object reference, required Object originalReference}) => 'De hoofdstukken en verzen van de ${translation} zijn anders genummerd dan in de meeste Engelse vertalingen.\n\nDe tekst die hier bij ${reference} wordt getoond, komt uit ${originalReference} in de ${translation} en is opnieuw gekoppeld om met de andere vertalingen overeen te komen.',
 			'compare.unavailable' => ({required Object translation}) => '${translation} bevat deze selectie niet.',
 			'commentaryUi.introTo' => ({required Object book}) => 'Inleiding tot ${book}',
+			'commentaryUi.chapterOutline' => 'Hoofdstukoverzicht',
+			'commentaryUi.previousSection' => 'Vorige sectie',
+			'commentaryUi.nextSection' => 'Volgende sectie',
 			'searchLocations.currentBook' => 'Huidig boek',
 			'searchLocations.testaments' => 'Testamenten',
 			'searchLocations.books' => 'Boeken',

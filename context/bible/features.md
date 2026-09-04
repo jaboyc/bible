@@ -290,7 +290,11 @@ Lux bundles:
 - John Calvin
 - Jamieson-Fausset-Brown
 
-Commentary can be opened for a chapter or verse selection. It also includes available book introductions.
+Commentary can be opened for a chapter or verse selection. It also includes available book introductions, including
+Calvin's book-level Argument material.
+Matthew Henry includes its available chapter outlines before the verse commentary.
+Commentary formatting preserves source distinctions such as headings, quotations, poetry, attribution lines, and
+tables. Selecting an item in a chapter outline scrolls both the commentary and Bible directly to that passage.
 
 Users can:
 
@@ -298,6 +302,8 @@ Users can:
 - Reorder active commentaries
 - Swipe between commentaries in the temporary sheet
 - Pin a specific commentary as a study panel
+- Keep a Commentary study panel aligned with the top visible verse while scrolling either surface
+- Move directly between adjacent Commentary headings from each sticky header
 - Open Scripture links in commentary as passage previews
 
 ## Cross References
@@ -380,9 +386,10 @@ The Dictionary and Lexicon are also available as independent main-toolbar shortc
 
 Study panels stay visible while the user reads. Most show the currently visible verses or active selection.
 
-Compare panels are linked reading surfaces. They show the entire current chapter and remain aligned to the top visible
-verse in the main Bible. Scrolling either the Bible or the Compare panel moves the other surface to the corresponding
-verse.
+Compare and Commentary panels are linked reading surfaces. They show the entire current chapter and remain aligned to
+the top visible verse in the main Bible. Scrolling either the Bible or a linked panel moves the other surface to the
+corresponding verse. Commentary book introductions and chapter outlines remain at verse 1 until verse-linked
+commentary reaches the top of the panel.
 
 Available panel types are:
 

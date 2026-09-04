@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:bible/models/commentary.dart';
 import 'package:bible/models/commentary_type.dart';
 import 'package:collection/collection.dart';
 import 'package:lux/lux_core.dart';
@@ -9,28 +10,32 @@ import 'package:utils_core/utils_core.dart';
 import 'package:xml/xml.dart';
 
 void main() {
-  for (final source in sources) {
-    final notes = source.inputs
-        .map((path) => _extractNotes(XmlDocument.parse(File(path).readAsStringSync()), source.type))
-        .fold(<String, String>{}, (acc, notes) {
-          notes.forEach((key, value) => acc.update(key, (accNotes) => '$accNotes\n\n$value', ifAbsent: () => value));
-          return acc;
-        });
-    appAssetFile('commentary/${source.output}', app: .bible).writeAsStringSync(jsonEncode({'v': notes}));
+  for (final source in CommentaryType.values) {
+    final commentaryByBook = source.inputs
+        .map((path) => _extractCommentary(XmlDocument.parse(File(path).readAsStringSync()), source))
+        .reduce(_mergeCommentaries);
+
+    final directory = appAssetDirectory('commentary/${source.output}', app: .bible)..createSync(recursive: true);
+    for (final book in BookType.values) {
+      (directory - '${book.usxCode()}.json').writeAsStringSync(
+        jsonEncode((commentaryByBook[book] ?? CommentaryBook()).toJson()),
+      );
+    }
   }
 }
 
-Map<String, String> _extractNotes(XmlDocument doc, CommentaryType type) {
+Map<BookType, CommentaryBook> _extractCommentary(XmlDocument doc, CommentaryType type) {
+  final sourceStyles = _getSourceStyles(doc);
   for (final note in doc.findAllElements('note').toList()) {
     note.remove();
   }
 
-  final intros = switch (type) {
+  final introductions = switch (type) {
     .jamiesonFaussetBrown =>
       doc
           .findAllElements('div3')
           .where((div) => div.getAttribute('title') == 'Introduction')
-          .mapToMap((intro) => MapEntry(_referenceOf(intro.parent), _introMarkdown(intro.childElements)))
+          .mapToMap((intro) => MapEntry(_bookOf(intro.parent), _introContent(intro.childElements, sourceStyles)))
           .withoutNullKeys,
     .matthewHenry =>
       doc
@@ -38,34 +43,118 @@ Map<String, String> _extractNotes(XmlDocument doc, CommentaryType type) {
           .where((div) => div.getAttribute('title') != null)
           .mapToMap(
             (intro) => MapEntry(
-              _referenceOf(intro),
-              _introMarkdown(intro.childElements.takeWhile((e) => e.name.local != 'div2')),
+              _bookOf(intro),
+              _introContent(
+                intro.childElements.takeWhile(
+                  (element) =>
+                      element.name.local != 'div2' &&
+                      element.name.local != 'scripCom' &&
+                      !(element.name.local == 'div' && element.getAttribute('class') == 'Commentary') &&
+                      !(element.name.local == 'table' && element.innerText.contains('Chapter Outline')),
+                ),
+                sourceStyles,
+                skipHeadings: true,
+              ),
             ),
           )
           .withoutNullKeys,
-    _ => <String, String>{},
+    .calvin =>
+      doc.descendants
+          .whereType<XmlElement>()
+          .where((element) => element.getAttribute('title') == 'The Argument')
+          .mapToMap(
+            (argument) => MapEntry(_bookOf(argument.parent), _introContent(argument.childElements, sourceStyles)),
+          )
+          .withoutNullKeys,
   };
 
-  String? pendingRef;
-  final notes = doc.descendants.whereType<XmlElement>().fold(<String, String>{}, (notes, element) {
+  final blocksByChapter = <ChapterReference, List<CommentaryBlock>>{};
+  if (type == .matthewHenry) {
+    doc
+        .findAllElements('table')
+        .where((table) => table.innerText.contains('Chapter Outline'))
+        .map(_extractOutline)
+        .nonNulls
+        .forEach(
+          (entry) =>
+              blocksByChapter.update(entry.key, (blocks) => [...blocks, entry.value], ifAbsent: () => [entry.value]),
+        );
+  }
+
+  VerseSelection? pendingSelection;
+  doc.descendants.whereType<XmlElement>().forEach((element) {
     switch (element.name.local) {
       case 'scripCom':
-        pendingRef = element.getAttribute('osisRef')?.split(':').last;
+        pendingSelection = _getSupportedOsisId(element)?.mapIfNonNull(VerseSelection.fromOsisId);
       case 'div' when element.getAttribute('class') == 'Commentary':
-        if (pendingRef case final ref?) {
-          final markdown = _commentaryMarkdown(_commentaryElements(element.childElements));
-          if (markdown.isNotEmpty) {
-            notes.update(ref, (existing) => '$existing\n\n$markdown', ifAbsent: () => markdown);
+        if (pendingSelection case final selection?) {
+          final content = _commentaryContent(element.childElements, sourceStyles, skipHeadings: true).toList();
+          if (selection.references.firstOrNull case final reference? when content.isNotEmpty) {
+            final block = CommentaryBlock.section(selection: selection, content: content);
+            blocksByChapter.update(
+              reference.toChapterReference(),
+              (blocks) => _mergeBlock(blocks, block),
+              ifAbsent: () => [block],
+            );
           }
-          pendingRef = null;
+          pendingSelection = null;
         }
     }
-    return notes;
   });
-  return {...intros.where((reference, markdown) => markdown.isNotEmpty), ...notes};
+
+  return BookType.values.mapToMap(
+    (book) => MapEntry(
+      book,
+      CommentaryBook(
+        introduction: introductions[book] ?? [],
+        blocksByChapter: blocksByChapter
+            .where((chapter, blocks) => chapter.book == book && blocks.isNotEmpty)
+            .map((chapter, blocks) => MapEntry(chapter.chapterNum, blocks)),
+      ),
+    ),
+  );
 }
 
-String? _referenceOf(XmlNode? container) => container
+Map<BookType, CommentaryBook> _mergeCommentaries(
+  Map<BookType, CommentaryBook> curr,
+  Map<BookType, CommentaryBook> next,
+) => BookType.values.mapToMap((book) {
+  final first = curr[book] ?? CommentaryBook();
+  final second = next[book] ?? CommentaryBook();
+  return MapEntry(book, _mergeCommentaryBooks(first, second));
+});
+
+CommentaryBook _mergeCommentaryBooks(CommentaryBook first, CommentaryBook second) => CommentaryBook(
+  introduction: first.introduction + second.introduction,
+  blocksByChapter: {
+    ...first.blocksByChapter,
+    ...second.blocksByChapter.mapValues(
+      (chapter, blocks) => _mergeBlocks(first.blocksByChapter[chapter] ?? [], blocks),
+    ),
+  },
+);
+
+List<CommentaryBlock> _mergeBlocks(List<CommentaryBlock> first, List<CommentaryBlock> second) =>
+    second.fold(first, _mergeBlock);
+
+List<CommentaryBlock> _mergeBlock(List<CommentaryBlock> blocks, CommentaryBlock block) {
+  final existingIndex = switch (block) {
+    CommentarySection(:final selection) => blocks.indexWhereOrNull(
+      (candidate) => candidate is CommentarySection && candidate.selection == selection,
+    ),
+    CommentaryOutline() => null,
+  };
+  return existingIndex == null
+      ? [...blocks, block]
+      : blocks.withUpdateAt(
+          existingIndex,
+          (existing) => (existing as CommentarySection).copyWith(
+            content: existing.content + (block as CommentarySection).content,
+          ),
+        );
+}
+
+BookType? _bookOf(XmlNode? container) => container
     ?.findAllElements('scripCom')
     .firstOrNull
     ?.getAttribute('osisRef')
@@ -73,30 +162,42 @@ String? _referenceOf(XmlNode? container) => container
     .last
     .split('.')
     .first
-    .mapIfNonNull((book) => Reference(book: BookType.fromOsisId(book), chapterNum: 1, verseNum: 0).osisId());
+    .mapIfNonNull(BookType.fromOsisId);
 
-String _introMarkdown(Iterable<XmlElement> elements) =>
-    _commentaryMarkdown(_commentaryElements(elements), skipIntroduction: true, skipCenteredParagraphs: true);
+List<CommentaryContent> _introContent(
+  Iterable<XmlElement> elements,
+  Map<String, Map<String, String>> sourceStyles, {
+  bool skipHeadings = false,
+}) => _commentaryContent(elements, sourceStyles, skipIntroduction: true, skipHeadings: skipHeadings).toList();
 
-Iterable<XmlElement> _commentaryElements(Iterable<XmlElement> elements) => elements.expand(
-  (element) => switch (element.name.local) {
-    'p' || 'verse' => [element],
-    _ => element.descendants.whereType<XmlElement>().where(
-      (descendant) => descendant.name.local == 'p' || descendant.name.local == 'verse',
-    ),
-  },
-);
+MapEntry<ChapterReference, CommentaryBlock>? _extractOutline(XmlElement outlineTable) {
+  final items = outlineTable
+      .findAllElements('tr')
+      .map((row) {
+        final references = row
+            .findAllElements('scripRef')
+            .map(_getSupportedOsisId)
+            .nonNulls
+            .expand((osisId) => VerseSelection.fromOsisId(osisId).references)
+            .toList();
+        final text = row
+            .findElements('td')
+            .firstOrNull
+            ?.childElements
+            .map((element) => _commentaryMarkdown([element]))
+            .firstWhereOrNull((markdown) => markdown.isNotEmpty);
+        return references.isEmpty || text == null
+            ? null
+            : CommentaryOutlineItem(selection: VerseSelection.fromReferences(references), text: Markdown(text));
+      })
+      .nonNulls
+      .toList();
+  final reference = items.firstOrNull?.selection.references.firstOrNull;
+  return reference == null ? null : MapEntry(reference.toChapterReference(), CommentaryBlock.outline(items: items));
+}
 
-String _commentaryMarkdown(
-  Iterable<XmlElement> blocks, {
-  bool skipIntroduction = false,
-  bool skipCenteredParagraphs = false,
-}) => Markdown.fromXmlNodes(blocks, (element, children) {
+String _commentaryMarkdown(Iterable<XmlElement> blocks) => Markdown.fromXmlNodes(blocks, (element, children) {
   if (element.name.local == 'p') {
-    if (_isSkippedParagraph(element.getAttribute('class') ?? '', skipCenteredParagraphs: skipCenteredParagraphs) ||
-        (skipIntroduction && children.plainText.trim().toUpperCase() == 'INTRODUCTION')) {
-      return [];
-    }
     return [.paragraph(children)];
   }
   if (element.name.local == 'scripRef') {
@@ -122,10 +223,119 @@ String _commentaryMarkdown(
   };
 }).text.trim();
 
-bool _isSkippedParagraph(String className, {required bool skipCenteredParagraphs}) =>
-    className == 'Footnote' ||
-    (skipCenteredParagraphs && className == 'Center') ||
-    className.startsWith('TableCaption');
+Iterable<CommentaryContent> _commentaryContent(
+  Iterable<XmlElement> elements,
+  Map<String, Map<String, String>> sourceStyles, {
+  bool skipIntroduction = false,
+  bool skipHeadings = false,
+  CommentaryParagraphStyle? inheritedStyle,
+}) => elements.expand((element) {
+  final elementStyle = _getParagraphStyle(element, sourceStyles) ?? inheritedStyle;
+  return switch (element.name.local) {
+    'p' || 'verse' => () {
+      final markdown = Markdown(_commentaryMarkdown([element]));
+      final isIntroductionHeading = RegExp(
+        r'^INTRODUCTION\.?$',
+      ).hasMatch(markdown.withStrippedMarkdown.trim().toUpperCase());
+      return markdown.text.isEmpty || (skipIntroduction && isIntroductionHeading)
+          ? <CommentaryContent>[]
+          : [CommentaryContent.paragraph(text: markdown, style: elementStyle ?? .body)];
+    }(),
+    'h1' || 'h2' || 'h3' || 'h4' || 'h5' || 'h6' =>
+      skipHeadings
+          ? <CommentaryContent>[]
+          : () {
+              final markdown = Markdown(_commentaryMarkdown([element]));
+              return markdown.text.isEmpty
+                  ? <CommentaryContent>[]
+                  : [CommentaryContent.paragraph(text: markdown, style: .heading)];
+            }(),
+    'table' => _getCommentaryTable(element),
+    'blockquote' => _commentaryContent(
+      element.childElements,
+      sourceStyles,
+      skipIntroduction: skipIntroduction,
+      skipHeadings: skipHeadings,
+      inheritedStyle: .quote,
+    ),
+    _ => _commentaryContent(
+      element.childElements,
+      sourceStyles,
+      skipIntroduction: skipIntroduction,
+      skipHeadings: skipHeadings,
+      inheritedStyle: elementStyle,
+    ),
+  };
+});
+
+Iterable<CommentaryContent> _getCommentaryTable(XmlElement table) {
+  final rows = table
+      .findAllElements('tr')
+      .map(
+        (row) => row.childElements
+            .where((cell) => cell.name.local == 'td' || cell.name.local == 'th')
+            .map((cell) => Markdown(_commentaryMarkdown([cell])))
+            .toList(),
+      )
+      .where((row) => row.isNotEmpty)
+      .toList();
+  return rows.isEmpty ? [] : [CommentaryContent.table(rows: rows)];
+}
+
+CommentaryParagraphStyle? _getParagraphStyle(XmlElement element, Map<String, Map<String, String>> sourceStyles) {
+  final className = element.getAttribute('class') ?? '';
+  final CommentaryParagraphStyle? classStyle = switch (className.toLowerCase()) {
+    'attribution' => .attribution,
+    'center' => .centered,
+    'bold' => .bold,
+    'italic' => .italic,
+    final name when name.startsWith('continue') || name.startsWith('bigc') => .boldItalic,
+    'big' => .heading,
+    final name when name.startsWith('book-chap') => .heading,
+    final name when name.startsWith('scripture') => .quote,
+    final name when name.startsWith('poetry') => .poetry,
+    final name when name.startsWith('tablecaption') => .heading,
+    _ => null,
+  };
+  if (classStyle != null) return classStyle;
+
+  final properties = {...?sourceStyles[className], ..._getInlineStyle(element.getAttribute('style'))};
+  final isCentered = properties['text-align'] == 'center';
+  final isBold = properties['font-weight'] == 'bold';
+  final isItalic = properties['font-style'] == 'italic';
+  final isLarge =
+      properties['font-size']?.endsWith('%') == true &&
+      (double.tryParse(properties['font-size']!.replaceAll('%', '')) ?? 100) > 100;
+
+  if (isCentered && (isBold || isLarge)) return .heading;
+  if (isCentered) return .centered;
+  if (properties.containsKey('margin-left')) return .indented;
+  if (isBold && isItalic) return .boldItalic;
+  if (isBold) return .bold;
+  if (isItalic) return .italic;
+  return null;
+}
+
+Map<String, String> _getInlineStyle(String? style) =>
+    style
+        ?.split(';')
+        .map((declaration) => declaration.split(':').map((part) => part.trim()).toList())
+        .where((parts) => parts.length == 2)
+        .mapToMap((parts) => MapEntry(parts.first, parts.last)) ??
+    {};
+
+Map<String, Map<String, String>> _getSourceStyles(XmlDocument doc) => doc
+    .findAllElements('selector')
+    .where((selector) => selector.getAttribute('class') != null)
+    .mapToMap(
+      (selector) => MapEntry(
+        selector.getAttribute('class')!,
+        selector
+            .findElements('property')
+            .where((property) => property.getAttribute('name') != null && property.getAttribute('value') != null)
+            .mapToMap((property) => MapEntry(property.getAttribute('name')!, property.getAttribute('value')!)),
+      ),
+    );
 
 String? _getSupportedOsisId(XmlElement element) {
   final osisRef = element.getAttribute('osisRef');
@@ -139,31 +349,19 @@ String? _getSupportedOsisId(XmlElement element) {
   return VerseSelection.isOsisId(osisId) ? osisId : null;
 }
 
-class CommentarySource {
-  final CommentaryType type;
-  final String output;
-  final List<String> inputs;
+extension on CommentaryType {
+  String get output => switch (this) {
+    .matthewHenry => 'matthew_henry',
+    .jamiesonFaussetBrown => 'jamieson_fausset_brown',
+    .calvin => 'calvin',
+  };
 
-  const CommentarySource({required this.type, required this.output, required this.inputs});
-}
-
-final sources = [
-  CommentarySource(
-    type: .matthewHenry,
-    output: 'matthew_henry.json',
-    inputs: [sourceFile('commentary/matthew_henry.xml').path],
-  ),
-  CommentarySource(
-    type: .jamiesonFaussetBrown,
-    output: 'jamieson_fausset_brown.json',
-    inputs: [sourceFile('commentary/jfb.xml').path],
-  ),
-  CommentarySource(
-    type: .calvin,
-    output: 'calvin.json',
-    inputs: Range.generate(
+  List<String> get inputs => switch (this) {
+    .matthewHenry => [sourceFile('commentary/matthew_henry.xml').path],
+    .jamiesonFaussetBrown => [sourceFile('commentary/jfb.xml').path],
+    .calvin => Range.generate(
       1,
       45,
     ).map((i) => sourceFile('commentary/calvin/calcom${i.toString().padLeft(2, '0')}.xml').path).toList(),
-  ),
-];
+  };
+}

@@ -45,7 +45,7 @@ extension GlobalKeyExtensions on GlobalKey {
     final scrollable = Scrollable.maybeOf(context, axis: axis);
     if (scrollable == null) return;
 
-    scrollable.position.ensureVisible(
+    await scrollable.position.ensureVisible(
       context.findRenderObject()!,
       alignment: alignment,
       duration: duration,
