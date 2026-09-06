@@ -28,7 +28,7 @@ class OnboardingPanel extends HookConsumerWidget {
     final keyByStep = useMemoized(() => OnboardingStep.values.mapToMap((step) => MapEntry(step, GlobalKey())));
 
     usePostFrameEffect(() async {
-      if (currentStep == null || !isVisible) return;
+      if (currentStep == null || currentStep == OnboardingStep.values.first || !isVisible) return;
       await Future.delayed(Duration(milliseconds: 200));
       keyByStep[currentStep]?.scrollIntoView(alignment: 0.5, duration: Duration(milliseconds: 300));
     }, [currentStep]);
