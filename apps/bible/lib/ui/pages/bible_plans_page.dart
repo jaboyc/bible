@@ -35,11 +35,10 @@ class BiblePlansPage extends HookConsumerWidget implements StyledRoute<VerseSele
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         if (!context.mounted || isProcessingRef.value) return;
 
-        final discoveredPlanTypes = currUser.planProgressByType
+        final completedPlanTypes = currUser.planProgressByType
             .where((planType, progress) {
               final previousProgress = prevUser.planProgressByType[planType];
-              return progress.reminder == null &&
-                  previousProgress != null &&
+              return previousProgress != null &&
                   progress.days.anyIndexed(
                     (dayIndex, day) => switch (previousProgress.days.elementAtOrNull(dayIndex)) {
                       final previousDay? => !previousDay.isComplete && day.isComplete,
@@ -49,14 +48,17 @@ class BiblePlansPage extends HookConsumerWidget implements StyledRoute<VerseSele
             })
             .keys
             .toList();
-        if (discoveredPlanTypes.isEmpty) return;
+        if (completedPlanTypes.isEmpty) return;
 
         isProcessingRef.value = true;
         try {
-          for (final planType in discoveredPlanTypes) {
+          for (final planType in completedPlanTypes.where(
+            (planType) => currUser.planProgressByType[planType]?.reminder == null,
+          )) {
             if (!context.mounted) break;
             await BiblePlanReminderFlow.showDiscoveryPrompt(context: context, planType: planType);
           }
+          await ref.read(userProvider.notifier).requestReviewIfEligible();
         } finally {
           isProcessingRef.value = false;
         }

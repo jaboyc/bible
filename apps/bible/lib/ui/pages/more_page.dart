@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:app_settings/app_settings.dart';
 import 'package:bible/models/user/toolbar_preset.dart';
 import 'package:bible/providers/user_provider.dart';
@@ -17,14 +19,21 @@ import 'package:bible/utils/extensions/ref_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:in_app_review/in_app_review.dart';
 import 'package:lux/i18n.dart';
 import 'package:lux/lux.dart';
 import 'package:material_symbols_icons/material_symbols_icons.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:style/style.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final discordUri = Uri.parse('https://discord.gg/C4zfZDpZMB');
+final luxBibleUri = Uri.parse('https://www.luxbible.app');
+final instagramUri = Uri.parse('https://www.instagram.com/luxbible.app/');
+final facebookUri = Uri.parse('https://www.facebook.com/people/Lux-Bible/61591758211559/');
+final youtubeUri = Uri.parse('https://www.youtube.com/@luxbibleapp');
+final tiktokUri = Uri.parse('https://www.tiktok.com/@lux.bible');
+final appStoreReviewUri = Uri.parse('https://apps.apple.com/app/id6759510218?action=write-review');
+final playStoreReviewUri = Uri.parse('https://play.google.com/store/apps/details?id=app.luxbible.app');
 
 class MorePage extends HookConsumerWidget implements StyledRoute<VerseSelection> {
   const MorePage({super.key});
@@ -206,14 +215,49 @@ class MorePage extends HookConsumerWidget implements StyledRoute<VerseSelection>
                     launchUrl(discordUri);
                   },
                 ),
-                StyledListItem.externalNavigation(
-                  title: t.labels.instagram.toText(),
-                  subtitle: t.settings.tipsAndUpdates.toText(),
-                  leading: FaIcon(FontAwesomeIcons.instagram),
-                  onPressed: () {
-                    AnalyticsEvent.communityLinkPressed.log();
-                    launchUrl(Uri.parse('https://www.instagram.com/luxbible.app/'));
-                  },
+                StyledListItem.navigation(
+                  title: t.settings.followLux.toText(),
+                  subtitle: t.settings.socialMediaAndVideo.toText(),
+                  leading: Symbols.add_circle.toIcon(),
+                  onPressed: () => context.showStyledSheet(
+                    (context, _) => StyledSheet(
+                      title: t.settings.followLux.toText(),
+                      children: [
+                        StyledListItem.externalNavigation(
+                          title: t.labels.instagram.toText(),
+                          leading: FaIcon(FontAwesomeIcons.instagram),
+                          onPressed: () {
+                            AnalyticsEvent.communityLinkPressed.log();
+                            launchUrl(instagramUri);
+                          },
+                        ),
+                        StyledListItem.externalNavigation(
+                          title: t.labels.tiktok.toText(),
+                          leading: FaIcon(FontAwesomeIcons.tiktok),
+                          onPressed: () {
+                            AnalyticsEvent.communityLinkPressed.log();
+                            launchUrl(tiktokUri);
+                          },
+                        ),
+                        StyledListItem.externalNavigation(
+                          title: t.labels.facebook.toText(),
+                          leading: FaIcon(FontAwesomeIcons.facebook),
+                          onPressed: () {
+                            AnalyticsEvent.communityLinkPressed.log();
+                            launchUrl(facebookUri);
+                          },
+                        ),
+                        StyledListItem.externalNavigation(
+                          title: t.labels.youtube.toText(),
+                          leading: FaIcon(FontAwesomeIcons.youtube),
+                          onPressed: () {
+                            AnalyticsEvent.communityLinkPressed.log();
+                            launchUrl(youtubeUri);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -224,40 +268,32 @@ class MorePage extends HookConsumerWidget implements StyledRoute<VerseSelection>
               children: [
                 StyledListItem(
                   title: t.settings.rateLux.toText(),
-                  subtitle: t.settings.leaveReview.toText(),
+                  subtitle: t.settings.leaveReview(store: Platform.isIOS ? 'App Store' : 'Play Store').toText(),
                   leading: Symbols.star.toIcon(),
-                  onPressed: () {
+                  onPressed: () async {
                     AnalyticsEvent.rateLuxPressed.log();
-                    context.showStyledDialog(
-                      (context) => StyledDialog(
-                        title: t.settings.supportLux.toText(),
-                        body: t.settings.supportMessage.toText(),
-                        buttonsBuilder: (context) => [
-                          StyledRectButton.primary(
-                            label: t.settings.leaveRating.toText(),
-                            onPressed: () async {
-                              context.pop();
-                              final appReview = InAppReview.instance;
-                              if (await appReview.isAvailable()) {
-                                await appReview.requestReview();
-                              } else {
-                                await appReview.openStoreListing(appStoreId: 'id6759510218');
-                              }
-                            },
-                          ),
-                          StyledRectButton.transparent(
-                            label: t.settings.joinDiscord.toText(),
-                            onPressed: () {
-                              context.pop();
-                              AnalyticsEvent.communityLinkPressed.log();
-                              launchUrl(discordUri);
-                            },
-                          ),
-                        ],
-                      ),
+                    await launchUrl(
+                      Platform.isIOS ? appStoreReviewUri : playStoreReviewUri,
+                      mode: .externalApplication,
                     );
                   },
                   trailing: Symbols.arrow_outward.toIcon(),
+                ),
+                Builder(
+                  builder: (shareContext) => StyledListItem(
+                    title: t.settings.shareLux.toText(),
+                    subtitle: t.settings.shareLuxDescription.toText(),
+                    leading: Symbols.share.toIcon(),
+                    onPressed: () async {
+                      final renderObject = shareContext.findRenderObject();
+                      final origin = renderObject is RenderBox
+                          ? renderObject.localToGlobal(Offset.zero) & renderObject.size
+                          : null;
+                      await SharePlus.instance.share(
+                        ShareParams(uri: luxBibleUri, title: 'Lux Bible', sharePositionOrigin: origin),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),

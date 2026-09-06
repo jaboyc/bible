@@ -28,7 +28,9 @@ Saving any reminder asks for notification permission only when needed. If app no
 
 ## Privacy and Analytics
 
-Lux measures visits to its main pages and a small set of prominent actions: starting audio playback, starting a plan, completing a plan day, searching, opening Verse of the Day, opening a local notification, changing toolbar configuration, opening a community link, pressing Rate Lux, and starting, completing, or skipping onboarding. These events contain no user-created content or dynamic identifiers from the app.
+Lux measures visits to its main pages and a small set of prominent actions: starting audio playback, starting a plan, completing a plan day, searching, opening Verse of the Day, opening a local notification, changing toolbar configuration, opening a community link, pressing Rate Lux, requesting the native review prompt, and starting, completing, or skipping onboarding. These events contain no user-created content or dynamic identifiers from the app.
+
+Lux counts distinct active days locally. After seven active days, it makes one native app-review request after the user finishes viewing a study action, completes a Bible plan day, or creates an annotation. The platform decides whether to display the native prompt.
 
 ## Bible Library
 
@@ -566,12 +568,12 @@ More is organized around:
 ### Community
 
 - Discord
-- Instagram
+- Follow Lux on Instagram, TikTok, Facebook, or YouTube
 
 ### Support Lux
 
-- Rate Lux through the platform store
-- Join Discord to share feedback
+- Rate Lux through the App Store or Play Store
+- Share the Lux website through the platform share sheet
 
 ### Help
 

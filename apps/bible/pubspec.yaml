@@ -63,6 +63,7 @@ dependencies:
   just_audio: ^0.10.6
   rxdart: ^0.28.0
   in_app_review: ^2.0.10
+  share_plus: ^13.3.0
   firebase_core: ^4.12.1
   firebase_app_check: ^0.4.7
   flutter_local_notifications: ^22.3.0

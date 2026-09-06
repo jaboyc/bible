@@ -526,6 +526,9 @@ class _Translations$labels$nl extends Translations$labels$en {
 	@override String get help => 'Help';
 	@override String get highlightStyles => 'Markeerstijlen';
 	@override String get instagram => 'Instagram';
+	@override String get facebook => 'Facebook';
+	@override String get tiktok => 'TikTok';
+	@override String get youtube => 'YouTube';
 	@override String get interlinear => 'Interlineair';
 	@override String get language => 'Taal';
 	@override String get layout => 'Indeling';
@@ -1239,13 +1242,13 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get presetWarning => 'Als je een preset selecteert, worden de snelkoppelingen in al je werkbalken overschreven.';
 	@override String get yourContent => 'Je inhoud';
 	@override String get discussionAndAnnouncements => 'Discussies en aankondigingen';
-	@override String get tipsAndUpdates => 'Tips en updates';
 	@override String get supportLux => 'Lux steunen';
 	@override String get rateLux => 'Lux beoordelen';
-	@override String get leaveReview => 'Schrijf een recensie in de App Store.';
-	@override String get supportMessage => 'Lux is een passieproject vanuit de overtuiging dat de Bijbel voor iedereen vrij beschikbaar moet zijn. De beste manier om Lux te steunen is met een recensie in de App Store.\n\nAls iets je ervan weerhoudt om een vijfsterrenrecensie te schrijven, word dan lid van onze Discord en deel je feedback. Dan kunnen we er snel iets aan doen.';
-	@override String get leaveRating => 'Beoordeling achterlaten';
-	@override String get joinDiscord => 'Lid worden van Discord';
+	@override String leaveReview({required Object store}) => 'Schrijf een recensie in de ${store}.';
+	@override String get followLux => 'Volg Lux';
+	@override String get socialMediaAndVideo => 'Sociale media en video';
+	@override String get shareLux => 'Deel Lux';
+	@override String get shareLuxDescription => 'Deel Lux met iemand.';
 	@override String get restartGetStarted => 'Aan de slag opnieuw starten';
 	@override String get restartGetStartedDescription => 'Toon de checklist Aan de slag opnieuw';
 	@override String get resetTutorials => 'Uitleg opnieuw instellen';
@@ -3095,6 +3098,9 @@ extension on TranslationsNl {
 			'labels.help' => 'Help',
 			'labels.highlightStyles' => 'Markeerstijlen',
 			'labels.instagram' => 'Instagram',
+			'labels.facebook' => 'Facebook',
+			'labels.tiktok' => 'TikTok',
+			'labels.youtube' => 'YouTube',
 			'labels.interlinear' => 'Interlineair',
 			'labels.language' => 'Taal',
 			'labels.layout' => 'Indeling',
@@ -3330,11 +3336,11 @@ extension on TranslationsNl {
 			'audio.connectionError' => 'Controleer je internetverbinding of probeer het later opnieuw.',
 			'audio.initializationError' => 'Er is een fout opgetreden',
 			'audio.initializationErrorDescription' => 'Er is een fout opgetreden bij het instellen van audio voor dit apparaat. Sluit de app geforceerd af en open hem opnieuw.',
+			_ => null,
+		} ?? switch (path) {
 			'audio.unavailable' => 'Audio is niet beschikbaar voor deze Bijbel',
 			'audio.chooseBible' => 'Kies een Bijbel met audio om naar dit hoofdstuk te luisteren.',
 			'audio.switchRequired' => 'Schakel over naar een Bijbel met audio om naar dit gedeelte te luisteren.',
-			_ => null,
-		} ?? switch (path) {
 			'audio.rewindTenSeconds' => '10 seconden terug',
 			'audio.fastForwardTenSeconds' => '10 seconden vooruit',
 			'audio.notificationChannelName' => 'Bijbelaudio afspelen',
@@ -3805,13 +3811,13 @@ extension on TranslationsNl {
 			'settings.presetWarning' => 'Als je een preset selecteert, worden de snelkoppelingen in al je werkbalken overschreven.',
 			'settings.yourContent' => 'Je inhoud',
 			'settings.discussionAndAnnouncements' => 'Discussies en aankondigingen',
-			'settings.tipsAndUpdates' => 'Tips en updates',
 			'settings.supportLux' => 'Lux steunen',
 			'settings.rateLux' => 'Lux beoordelen',
-			'settings.leaveReview' => 'Schrijf een recensie in de App Store.',
-			'settings.supportMessage' => 'Lux is een passieproject vanuit de overtuiging dat de Bijbel voor iedereen vrij beschikbaar moet zijn. De beste manier om Lux te steunen is met een recensie in de App Store.\n\nAls iets je ervan weerhoudt om een vijfsterrenrecensie te schrijven, word dan lid van onze Discord en deel je feedback. Dan kunnen we er snel iets aan doen.',
-			'settings.leaveRating' => 'Beoordeling achterlaten',
-			'settings.joinDiscord' => 'Lid worden van Discord',
+			'settings.leaveReview' => ({required Object store}) => 'Schrijf een recensie in de ${store}.',
+			'settings.followLux' => 'Volg Lux',
+			'settings.socialMediaAndVideo' => 'Sociale media en video',
+			'settings.shareLux' => 'Deel Lux',
+			'settings.shareLuxDescription' => 'Deel Lux met iemand.',
 			'settings.restartGetStarted' => 'Aan de slag opnieuw starten',
 			'settings.restartGetStartedDescription' => 'Toon de checklist Aan de slag opnieuw',
 			'settings.resetTutorials' => 'Uitleg opnieuw instellen',

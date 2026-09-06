@@ -526,6 +526,9 @@ class _Translations$labels$ru extends Translations$labels$en {
 	@override String get help => 'Помощь';
 	@override String get highlightStyles => 'Стили выделения';
 	@override String get instagram => 'Инстаграм';
+	@override String get facebook => 'Facebook';
+	@override String get tiktok => 'TikTok';
+	@override String get youtube => 'YouTube';
 	@override String get interlinear => 'Подстрочный';
 	@override String get language => 'Язык';
 	@override String get layout => 'Макет';
@@ -1245,13 +1248,13 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get presetWarning => 'Выбор набора заменит ярлыки на всех панелях инструментов.';
 	@override String get yourContent => 'Ваш контент';
 	@override String get discussionAndAnnouncements => 'Обсуждение и анонсы';
-	@override String get tipsAndUpdates => 'Советы и обновления';
 	@override String get supportLux => 'Поддержать Lux';
 	@override String get rateLux => 'Оценить Lux';
-	@override String get leaveReview => 'Оставить отзыв в App Store.';
-	@override String get supportMessage => 'Lux создан с убеждением, что Священное Писание должно быть доступно каждому. Лучший способ поддержать Lux — оставить отзыв в App Store.\n\nЕсли что-то мешает вам поставить 5 звёзд, присоединитесь к нашему Discord и расскажите об этом, чтобы мы могли быстро решить проблему.';
-	@override String get leaveRating => 'Оставить оценку';
-	@override String get joinDiscord => 'Присоединиться к Discord';
+	@override String leaveReview({required Object store}) => 'Оставить отзыв в ${store}.';
+	@override String get followLux => 'Подписаться на Lux';
+	@override String get socialMediaAndVideo => 'Социальные сети и видео';
+	@override String get shareLux => 'Поделиться Lux';
+	@override String get shareLuxDescription => 'Поделитесь Lux с другими.';
 	@override String get restartGetStarted => 'Начать знакомство заново';
 	@override String get restartGetStartedDescription => 'Снова показать контрольный список знакомства с приложением.';
 	@override String get resetTutorials => 'Сбросить подсказки';
@@ -3101,6 +3104,9 @@ extension on TranslationsRu {
 			'labels.help' => 'Помощь',
 			'labels.highlightStyles' => 'Стили выделения',
 			'labels.instagram' => 'Инстаграм',
+			'labels.facebook' => 'Facebook',
+			'labels.tiktok' => 'TikTok',
+			'labels.youtube' => 'YouTube',
 			'labels.interlinear' => 'Подстрочный',
 			'labels.language' => 'Язык',
 			'labels.layout' => 'Макет',
@@ -3336,11 +3342,11 @@ extension on TranslationsRu {
 			'audio.connectionError' => 'Проверьте подключение к Интернету или повторите попытку позже.',
 			'audio.initializationError' => 'Произошла ошибка',
 			'audio.initializationErrorDescription' => 'При настройке аудио на этом устройстве произошла ошибка. Принудительно закройте приложение и откройте его снова.',
+			_ => null,
+		} ?? switch (path) {
 			'audio.unavailable' => 'Звук для этой Библии недоступен.',
 			'audio.chooseBible' => 'Чтобы прослушать эту главу, выберите Библию с аудиозаписью.',
 			'audio.switchRequired' => 'Чтобы прослушать этот отрывок, переключитесь на Библию с аудиозаписью.',
-			_ => null,
-		} ?? switch (path) {
 			'audio.rewindTenSeconds' => 'На 10 секунд назад',
 			'audio.fastForwardTenSeconds' => 'На 10 секунд вперед',
 			'audio.notificationChannelName' => 'Аудио воспроизведение Библии',
@@ -3811,13 +3817,13 @@ extension on TranslationsRu {
 			'settings.presetWarning' => 'Выбор набора заменит ярлыки на всех панелях инструментов.',
 			'settings.yourContent' => 'Ваш контент',
 			'settings.discussionAndAnnouncements' => 'Обсуждение и анонсы',
-			'settings.tipsAndUpdates' => 'Советы и обновления',
 			'settings.supportLux' => 'Поддержать Lux',
 			'settings.rateLux' => 'Оценить Lux',
-			'settings.leaveReview' => 'Оставить отзыв в App Store.',
-			'settings.supportMessage' => 'Lux создан с убеждением, что Священное Писание должно быть доступно каждому. Лучший способ поддержать Lux — оставить отзыв в App Store.\n\nЕсли что-то мешает вам поставить 5 звёзд, присоединитесь к нашему Discord и расскажите об этом, чтобы мы могли быстро решить проблему.',
-			'settings.leaveRating' => 'Оставить оценку',
-			'settings.joinDiscord' => 'Присоединиться к Discord',
+			'settings.leaveReview' => ({required Object store}) => 'Оставить отзыв в ${store}.',
+			'settings.followLux' => 'Подписаться на Lux',
+			'settings.socialMediaAndVideo' => 'Социальные сети и видео',
+			'settings.shareLux' => 'Поделиться Lux',
+			'settings.shareLuxDescription' => 'Поделитесь Lux с другими.',
 			'settings.restartGetStarted' => 'Начать знакомство заново',
 			'settings.restartGetStartedDescription' => 'Снова показать контрольный список знакомства с приложением.',
 			'settings.resetTutorials' => 'Сбросить подсказки',

@@ -65,7 +65,7 @@ enum StudyAction {
   }) async {
     switch (this) {
       case .interlinear:
-        context.showStyledSheetWithBreadcrumbs(breadcrumbText: regionFormat, (context, _) {
+        await context.showStyledSheetWithBreadcrumbs(breadcrumbText: regionFormat, (context, _) {
           final user = ref.read(userProvider);
 
           final tabController = useTabController(
@@ -117,7 +117,7 @@ enum StudyAction {
           );
         });
       case .commentary:
-        context.showStyledSheet((context, ref) {
+        await context.showStyledSheet((context, ref) {
           final user = ref.watch(userProvider);
           final tabController = useTabController(
             initialLength: user.commentariesOrDefault.length,
@@ -184,7 +184,7 @@ enum StudyAction {
           );
         });
       case .compare:
-        context.showStyledSheet((context, ref) {
+        await context.showStyledSheet((context, ref) {
           final user = ref.watch(userProvider);
           return StyledSheet(
             title: title().toText(),
@@ -203,7 +203,7 @@ enum StudyAction {
         });
       case .crossReferences:
         ref.markOnboardingStep(.crossReferences);
-        context.showStyledSheet(
+        await context.showStyledSheet(
           (context, _) => StyledSheet(
             title: title().toText(),
             subtitle: SingleChildScrollView(
@@ -230,5 +230,7 @@ enum StudyAction {
           ),
         );
     }
+
+    await ref.read(userProvider.notifier).requestReviewIfEligible();
   }
 }

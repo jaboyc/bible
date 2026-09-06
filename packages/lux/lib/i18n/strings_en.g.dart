@@ -1065,6 +1065,15 @@ class Translations$labels$en {
 	/// en: 'Instagram'
 	String get instagram => 'Instagram';
 
+	/// en: 'Facebook'
+	String get facebook => 'Facebook';
+
+	/// en: 'TikTok'
+	String get tiktok => 'TikTok';
+
+	/// en: 'YouTube'
+	String get youtube => 'YouTube';
+
 	/// en: 'Interlinear'
 	String get interlinear => 'Interlinear';
 
@@ -2543,26 +2552,26 @@ class Translations$settings$en {
 	/// en: 'Discussion and announcements'
 	String get discussionAndAnnouncements => 'Discussion and announcements';
 
-	/// en: 'Tips and updates'
-	String get tipsAndUpdates => 'Tips and updates';
-
 	/// en: 'Support Lux'
 	String get supportLux => 'Support Lux';
 
 	/// en: 'Rate Lux'
 	String get rateLux => 'Rate Lux';
 
-	/// en: 'Leave a review on the App Store.'
-	String get leaveReview => 'Leave a review on the App Store.';
+	/// en: 'Leave a review on the {store}.'
+	String leaveReview({required Object store}) => 'Leave a review on the ${store}.';
 
-	/// en: 'Lux is a passion project built on the conviction that Scripture should be freely available to all. The best way to support Lux is by leaving a review on the App Store. If there is anything keeping you from leaving a 5-star review, please join our Discord and share your feedback so we can address it quickly.'
-	String get supportMessage => 'Lux is a passion project built on the conviction that Scripture should be freely available to all. The best way to support Lux is by leaving a review on the App Store.\n\nIf there is anything keeping you from leaving a 5-star review, please join our Discord and share your feedback so we can address it quickly.';
+	/// en: 'Follow Lux'
+	String get followLux => 'Follow Lux';
 
-	/// en: 'Leave a Rating'
-	String get leaveRating => 'Leave a Rating';
+	/// en: 'Social media and video'
+	String get socialMediaAndVideo => 'Social media and video';
 
-	/// en: 'Join Discord'
-	String get joinDiscord => 'Join Discord';
+	/// en: 'Share Lux'
+	String get shareLux => 'Share Lux';
+
+	/// en: 'Share Lux with someone.'
+	String get shareLuxDescription => 'Share Lux with someone.';
 
 	/// en: 'Restart Get Started'
 	String get restartGetStarted => 'Restart Get Started';
@@ -5073,6 +5082,9 @@ extension on Translations {
 			'labels.help' => 'Help',
 			'labels.highlightStyles' => 'Highlight Styles',
 			'labels.instagram' => 'Instagram',
+			'labels.facebook' => 'Facebook',
+			'labels.tiktok' => 'TikTok',
+			'labels.youtube' => 'YouTube',
 			'labels.interlinear' => 'Interlinear',
 			'labels.language' => 'Language',
 			'labels.layout' => 'Layout',
@@ -5310,11 +5322,11 @@ extension on Translations {
 			'audio.initializationErrorDescription' => 'An error occurred setting up the audio for this device. Try force-closing and reopening the app.',
 			'audio.unavailable' => 'Audio is unavailable for this Bible',
 			'audio.chooseBible' => 'Choose an audio-enabled Bible to listen to this chapter.',
+			_ => null,
+		} ?? switch (path) {
 			'audio.switchRequired' => 'Switch to an audio-enabled Bible to listen to this passage.',
 			'audio.rewindTenSeconds' => 'Back 10 seconds',
 			'audio.fastForwardTenSeconds' => 'Forward 10 seconds',
-			_ => null,
-		} ?? switch (path) {
 			'audio.notificationChannelName' => 'Audio Bible playback',
 			'audio.notificationChannelDescription' => 'Audio Bible playback controls',
 			'interlinearUi.interlinearBible' => 'Interlinear Bible',
@@ -5783,13 +5795,13 @@ extension on Translations {
 			'settings.presetWarning' => 'Selecting a preset will override the shortcuts in all your toolbars.',
 			'settings.yourContent' => 'Your Content',
 			'settings.discussionAndAnnouncements' => 'Discussion and announcements',
-			'settings.tipsAndUpdates' => 'Tips and updates',
 			'settings.supportLux' => 'Support Lux',
 			'settings.rateLux' => 'Rate Lux',
-			'settings.leaveReview' => 'Leave a review on the App Store.',
-			'settings.supportMessage' => 'Lux is a passion project built on the conviction that Scripture should be freely available to all. The best way to support Lux is by leaving a review on the App Store.\n\nIf there is anything keeping you from leaving a 5-star review, please join our Discord and share your feedback so we can address it quickly.',
-			'settings.leaveRating' => 'Leave a Rating',
-			'settings.joinDiscord' => 'Join Discord',
+			'settings.leaveReview' => ({required Object store}) => 'Leave a review on the ${store}.',
+			'settings.followLux' => 'Follow Lux',
+			'settings.socialMediaAndVideo' => 'Social media and video',
+			'settings.shareLux' => 'Share Lux',
+			'settings.shareLuxDescription' => 'Share Lux with someone.',
 			'settings.restartGetStarted' => 'Restart Get Started',
 			'settings.restartGetStartedDescription' => 'Show the Get Started checklist again.',
 			'settings.resetTutorials' => 'Reset Tutorials',

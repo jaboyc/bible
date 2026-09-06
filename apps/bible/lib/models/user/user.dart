@@ -1,6 +1,7 @@
 import 'package:bible/models/annotation.dart';
 import 'package:bible/models/bible_plan.dart';
 import 'package:bible/models/bookmark.dart';
+import 'package:bible/models/calendar_date_time.dart';
 import 'package:bible/models/color_enum.dart';
 import 'package:bible/models/commentary_type.dart';
 import 'package:bible/models/highlight_style.dart';
@@ -71,6 +72,9 @@ sealed class User with _$User {
     @Default(AudioBibleConfiguration()) AudioBibleConfiguration audio,
     Migration? latestMigration,
     @Default({}) Set<Message> messages,
+    @Default(0) int activeDayCount,
+    CalendarDateTime? lastActiveDate,
+    @Default(false) bool hasRequestedReview,
   }) = _User;
 
   factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
@@ -83,6 +87,11 @@ sealed class User with _$User {
     oldTestamentTranslation: oldTestamentTranslation,
     newTestamentTranslation: newTestamentTranslation,
   );
+
+  bool get isReviewRequestEligible => activeDayCount >= 7 && !hasRequestedReview;
+
+  bool shouldRequestReviewAfterUpdate(User previousUser) =>
+      isReviewRequestEligible && annotations.length > previousUser.annotations.length;
 
   List<CommentaryType> get commentariesOrDefault => commentaries ?? CommentaryType.values;
 
@@ -467,6 +476,10 @@ sealed class User with _$User {
 
   User withMessage(Message message) => copyWith(messages: {...messages, message});
   User withMessagePopped(Message message) => copyWith(messages: messages.withRemoved(message));
+
+  User withActiveDay(DateTime date) => lastActiveDate?.isOnSameLocalDateAs(date) == true
+      ? this
+      : copyWith(activeDayCount: activeDayCount + 1, lastActiveDate: CalendarDateTime.fromDateTime(date));
 }
 
 Object? _readLastHighlightStyle(Map data, String key) {

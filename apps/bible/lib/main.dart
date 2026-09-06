@@ -143,6 +143,7 @@ Future<void> main() async {
         observers: [ProviderErrorObserver()],
       );
 
+      ref.read(userProvider.notifier).refreshActiveDay();
       eagerlyLoad();
 
       runApp(UncontrolledProviderScope(container: ref, child: BibleApp()));

@@ -7,6 +7,7 @@ import 'package:bible/models/user/migration.dart';
 import 'package:bible/models/user/user.dart';
 import 'package:bible/services/analytics_service.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:in_app_review/in_app_review.dart';
 import 'package:lux/lux.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -66,9 +67,22 @@ class UserNotifier extends _$UserNotifier {
   User update(User Function(User) updater) {
     final previousUser = state;
     state = updater(previousUser);
+    final shouldRequestReview = state.shouldRequestReviewAfterUpdate(previousUser);
     logAnalytics(previousUser, state);
     userFile.writeAsStringSync(jsonEncode(state.toJson()));
+    if (shouldRequestReview) requestReviewIfEligible();
     return state;
+  }
+
+  void refreshActiveDay() => update((user) => user.withActiveDay(DateTime.now()));
+
+  Future<void> requestReviewIfEligible() async {
+    final appReview = InAppReview.instance;
+    if (!state.isReviewRequestEligible || !await appReview.isAvailable()) return;
+
+    update((user) => user.copyWith(hasRequestedReview: true));
+    AnalyticsEvent.reviewPromptRequested.log();
+    await appReview.requestReview();
   }
 
   void logAnalytics(User previousUser, User user) {

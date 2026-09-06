@@ -177,6 +177,11 @@ _User _$UserFromJson(Map<String, dynamic> json) => _User(
           ?.map((e) => $enumDecode(_$MessageEnumMap, e))
           .toSet() ??
       const {},
+  activeDayCount: (json['activeDayCount'] as num?)?.toInt() ?? 0,
+  lastActiveDate: json['lastActiveDate'] == null
+      ? null
+      : CalendarDateTime.fromJson(json['lastActiveDate'] as String),
+  hasRequestedReview: json['hasRequestedReview'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
@@ -232,6 +237,9 @@ Map<String, dynamic> _$UserToJson(_User instance) => <String, dynamic>{
   'audio': instance.audio.toJson(),
   'latestMigration': _$MigrationEnumMap[instance.latestMigration],
   'messages': instance.messages.map((e) => _$MessageEnumMap[e]!).toList(),
+  'activeDayCount': instance.activeDayCount,
+  'lastActiveDate': instance.lastActiveDate?.toJson(),
+  'hasRequestedReview': instance.hasRequestedReview,
 };
 
 const _$BibleTranslationEnumMap = {
