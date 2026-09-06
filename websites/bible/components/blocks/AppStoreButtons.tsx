@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ReactElement, useEffect, useState } from 'react';
 
 import { Button } from '@/components/ui/Button';
+import { getPreferredStore, StoreName } from '@/lib/store';
 
 const stores = {
   'app-store': {
@@ -19,8 +20,6 @@ const stores = {
     icon: <IconBrandGooglePlay style={{ width: '100%', height: '100%' }} />,
   },
 } as const;
-
-type StoreName = keyof typeof stores;
 
 function StoreButton({ store, href }: { store: StoreName; href: string }) {
   return (
@@ -40,17 +39,17 @@ export default function AppStoreButtons({
   appStoreUrl?: string;
   googlePlayUrl?: string;
 }) {
-  const [userAgent, setUserAgent] = useState('');
+  const [preferredStore, setPreferredStore] = useState<StoreName>();
   useEffect(() => {
-    setUserAgent(navigator.userAgent);
+    setPreferredStore(getPreferredStore(navigator));
   }, []);
 
   const buttons: ReactElement[] = [];
-  if (/iPhone|iPad|iPod/i.test(userAgent) && appStoreUrl) {
+  if (preferredStore === 'app-store' && appStoreUrl) {
     buttons.push(
       <StoreButton key="app-store" store="app-store" href={appStoreUrl} />,
     );
-  } else if (/Android/i.test(userAgent) && googlePlayUrl) {
+  } else if (preferredStore === 'google-play' && googlePlayUrl) {
     buttons.push(
       <StoreButton
         key="google-play"

@@ -8,6 +8,7 @@ import { CSSProperties } from 'react';
 import AppStoreButtons from '@/components/blocks/AppStoreButtons';
 import AppStoreScreenshots from '@/components/blocks/AppStoreScreenshots';
 import CtaButton from '@/components/blocks/CtaButton';
+import DownloadCtaButton from '@/components/blocks/DownloadCtaButton';
 import FeatureShowcase from '@/components/blocks/FeatureShowcase';
 import InstagramFeed from '@/components/blocks/InstagramFeed';
 import Page from '@/components/layout/Page';
@@ -75,7 +76,10 @@ export default function HomePage() {
             href="#built-for-readers"
             variant="ghost"
           />
-          <CtaButton text="Download for Free" href="#download" />
+          <DownloadCtaButton
+            appStoreUrl={site.appStoreUrl}
+            googlePlayUrl={site.googlePlayUrl}
+          />
         </div>
       </Section>
 
