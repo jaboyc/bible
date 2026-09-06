@@ -1255,6 +1255,10 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get socialMediaAndVideo => 'Социальные сети и видео';
 	@override String get shareLux => 'Поделиться Lux';
 	@override String get shareLuxDescription => 'Поделитесь Lux с другими.';
+	@override String get reportProblem => 'Сообщить о проблеме';
+	@override String get reportProblemDescription => 'Получите помощь с ошибками и другими проблемами.';
+	@override String get recommended => 'Рекомендуется';
+	@override String get emailSupport => 'Написать в поддержку';
 	@override String get restartGetStarted => 'Начать знакомство заново';
 	@override String get restartGetStartedDescription => 'Снова показать контрольный список знакомства с приложением.';
 	@override String get resetTutorials => 'Сбросить подсказки';
@@ -3824,6 +3828,10 @@ extension on TranslationsRu {
 			'settings.socialMediaAndVideo' => 'Социальные сети и видео',
 			'settings.shareLux' => 'Поделиться Lux',
 			'settings.shareLuxDescription' => 'Поделитесь Lux с другими.',
+			'settings.reportProblem' => 'Сообщить о проблеме',
+			'settings.reportProblemDescription' => 'Получите помощь с ошибками и другими проблемами.',
+			'settings.recommended' => 'Рекомендуется',
+			'settings.emailSupport' => 'Написать в поддержку',
 			'settings.restartGetStarted' => 'Начать знакомство заново',
 			'settings.restartGetStartedDescription' => 'Снова показать контрольный список знакомства с приложением.',
 			'settings.resetTutorials' => 'Сбросить подсказки',

@@ -27,6 +27,7 @@ import 'package:style/style.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 final discordUri = Uri.parse('https://discord.gg/C4zfZDpZMB');
+final supportEmailUri = Uri.parse('mailto:support@luxbible.app');
 final luxBibleUri = Uri.parse('https://www.luxbible.app');
 final instagramUri = Uri.parse('https://www.instagram.com/luxbible.app/');
 final facebookUri = Uri.parse('https://www.facebook.com/people/Lux-Bible/61591758211559/');
@@ -302,6 +303,33 @@ class MorePage extends HookConsumerWidget implements StyledRoute<VerseSelection>
             title: t.labels.help.toText(),
             child: StyledCard(
               children: [
+                StyledListItem.navigation(
+                  title: t.settings.reportProblem.toText(),
+                  subtitle: t.settings.reportProblemDescription.toText(),
+                  leading: Symbols.bug_report.toIcon(),
+                  onPressed: () => context.showStyledSheet(
+                    (context, _) => StyledSheet(
+                      title: t.settings.reportProblem.toText(),
+                      children: [
+                        StyledListItem.externalNavigation(
+                          title: t.labels.discord.toText(),
+                          subtitle: t.settings.recommended.toText(),
+                          leading: FaIcon(FontAwesomeIcons.discord),
+                          onPressed: () {
+                            AnalyticsEvent.communityLinkPressed.log();
+                            launchUrl(discordUri);
+                          },
+                        ),
+                        StyledListItem.externalNavigation(
+                          title: t.settings.emailSupport.toText(),
+                          subtitle: 'support@luxbible.app'.toText(),
+                          leading: Symbols.mail.toIcon(),
+                          onPressed: () => launchUrl(supportEmailUri),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
                 StyledListItem(
                   title: t.settings.restartGetStarted.toText(),
                   subtitle: t.settings.restartGetStartedDescription.toText(),

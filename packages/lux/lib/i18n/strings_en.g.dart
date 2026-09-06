@@ -2573,6 +2573,18 @@ class Translations$settings$en {
 	/// en: 'Share Lux with someone.'
 	String get shareLuxDescription => 'Share Lux with someone.';
 
+	/// en: 'Report a Problem'
+	String get reportProblem => 'Report a Problem';
+
+	/// en: 'Get help with bugs and other issues.'
+	String get reportProblemDescription => 'Get help with bugs and other issues.';
+
+	/// en: 'Recommended'
+	String get recommended => 'Recommended';
+
+	/// en: 'Email Support'
+	String get emailSupport => 'Email Support';
+
 	/// en: 'Restart Get Started'
 	String get restartGetStarted => 'Restart Get Started';
 
@@ -5802,6 +5814,10 @@ extension on Translations {
 			'settings.socialMediaAndVideo' => 'Social media and video',
 			'settings.shareLux' => 'Share Lux',
 			'settings.shareLuxDescription' => 'Share Lux with someone.',
+			'settings.reportProblem' => 'Report a Problem',
+			'settings.reportProblemDescription' => 'Get help with bugs and other issues.',
+			'settings.recommended' => 'Recommended',
+			'settings.emailSupport' => 'Email Support',
 			'settings.restartGetStarted' => 'Restart Get Started',
 			'settings.restartGetStartedDescription' => 'Show the Get Started checklist again.',
 			'settings.resetTutorials' => 'Reset Tutorials',

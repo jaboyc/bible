@@ -1249,6 +1249,10 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get socialMediaAndVideo => 'Sociale media en video';
 	@override String get shareLux => 'Deel Lux';
 	@override String get shareLuxDescription => 'Deel Lux met iemand.';
+	@override String get reportProblem => 'Een probleem melden';
+	@override String get reportProblemDescription => 'Krijg hulp bij bugs en andere problemen.';
+	@override String get recommended => 'Aanbevolen';
+	@override String get emailSupport => 'Ondersteuning via e-mail';
 	@override String get restartGetStarted => 'Aan de slag opnieuw starten';
 	@override String get restartGetStartedDescription => 'Toon de checklist Aan de slag opnieuw';
 	@override String get resetTutorials => 'Uitleg opnieuw instellen';
@@ -3818,6 +3822,10 @@ extension on TranslationsNl {
 			'settings.socialMediaAndVideo' => 'Sociale media en video',
 			'settings.shareLux' => 'Deel Lux',
 			'settings.shareLuxDescription' => 'Deel Lux met iemand.',
+			'settings.reportProblem' => 'Een probleem melden',
+			'settings.reportProblemDescription' => 'Krijg hulp bij bugs en andere problemen.',
+			'settings.recommended' => 'Aanbevolen',
+			'settings.emailSupport' => 'Ondersteuning via e-mail',
 			'settings.restartGetStarted' => 'Aan de slag opnieuw starten',
 			'settings.restartGetStartedDescription' => 'Toon de checklist Aan de slag opnieuw',
 			'settings.resetTutorials' => 'Uitleg opnieuw instellen',
